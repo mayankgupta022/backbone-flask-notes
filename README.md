@@ -28,7 +28,7 @@ Server is now running `http://localhsot:5000`
 Specifications
 --------------
 
-GET `http://localhost:5000/notes` - get all notes
-POST `http://localhost:5000/notes` - create a note
-PUT `http://localhost:5000/note/:id` - update a note with given id
-DELETE `http://localhost:5000/note/:id` - delete a note with given id
+1. GET `http://localhost:5000/notes` - get all notes
+2. POST `http://localhost:5000/notes` - create a note
+3. PUT `http://localhost:5000/note/:id` - update a note with given id
+4. DELETE `http://localhost:5000/note/:id` - delete a note with given id
