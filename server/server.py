@@ -1,10 +1,11 @@
-from flask import Flask, request
+from flask import Flask, request, Response
 from flaskext.mysql import MySQL
-from cors import *
+from flask.ext.cors import CORS
 import json
 
 mysql = MySQL()
 app = Flask(__name__)
+cors = CORS(app)
 
 app.config['MYSQL_DATABASE_USER'] = 'user'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'pass'
@@ -18,8 +19,7 @@ def log(msg):
 	log_file.write(msg + '\n')
 	log_file.close()
 
-@app.route('/notes', methods=['GET', 'POST'])
-@crossdomain(origin='*')
+@app.route('/notes', methods=['GET', 'POST', 'OPTIONS'])
 def notes():
 	con = mysql.connect()
 	cursor = con.cursor()
@@ -29,45 +29,51 @@ def notes():
 		stmt = "SELECT * FROM notes"
 		cursor.execute(stmt)
 		data = cursor.fetchall()		
-		info = [{"id" : item[0], "title": item[1], "content": item[2]} for item in data]
+		info = [{"id" : item[0], "title": item[1], "description": item[2]} for item in data]
 
-	else:
+	elif request.method == 'POST':
 		title = request.form['title']
-		content = request.form['content']
-		stmt = "INSERT INTO notes (title, content) VALUES (%s, %s)"
-		data = (title, content)
+		description = request.form['description']
+		stmt = "INSERT INTO notes (title, description) VALUES (%s, %s)"
+		data = (title, description)
 		cursor.execute(stmt, data)
 		id = cursor.lastrowid
 		con.commit()
-		info = {"id" : id, "title": title, "content": content}
+		info = {"id" : id, "title": title, "description": description}
 
-	return json.dumps(info)
+	return Response(json.dumps(info),  mimetype='application/json')
 
-@app.route('/note/<int:id>', methods=['PUT', 'DELETE'])
-@crossdomain(origin='*')
+@app.route('/note/<int:id>', methods=['GET', 'PUT', 'DELETE', 'OPTIONS'])
 def note(id):
 	con = mysql.connect()
 	cursor = con.cursor()
 	info = dict()
 
-	if request.method == 'PUT':
+	if request.method == 'GET':
+		stmt = "SELECT * FROM notes WHERE id = %s"
+		data = (id)
+		cursor.execute(stmt, data)
+		data = cursor.fetchone()
+		info = {"id" : data[0], "title": data[1], "description": data[2]}		
+
+	elif request.method == 'PUT':
 		title = request.form['title']
-		content = request.form['content']
-		stmt = "UPDATE notes SET title = %s , content = %s WHERE id = %s"
-		data = (title, content,id)
+		description = request.form['description']
+		stmt = "UPDATE notes SET title = %s , description = %s WHERE id = %s"
+		data = (title, description,id)
 		cursor.execute(stmt, data)
 		log(str(id))
 		con.commit()
-		info = {"id" : id, "title": title, "content": content}
+		info = {"id" : id, "title": title, "description": description}
 
-	else:
+	elif request.method == 'DELETE':
 		stmt = "DELETE FROM notes WHERE id = %s"
 		data = (id)
 		cursor.execute(stmt, data)
 		con.commit()
 		info = {"id" : id}
 
-	return json.dumps(info)
+	return Response(json.dumps(info),  mimetype='application/json')
 
 # @app.errorhandler(404)
 # def page_not_found(e):
@@ -82,4 +88,7 @@ def note(id):
 
 
 if __name__ == "__main__":
+	# import logging
+	# logging.basicConfig(filename='error.log',level=logging.DEBUG)
+	app.debug=True
 	app.run()
