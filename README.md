@@ -8,9 +8,10 @@ Installation
 
 1. <pre class="console">pip install flask</pre>
 2. <pre class="console">pip install flask-mysql</pre>
-3. Create a database in mysql
-4. Execute notes.sql in notes database
-5. Modify server.py and change following configuration based on your requirements
+3. <pre class="console">pip install flask-cors</pre>
+4. Create a database in mysql
+5. Execute notes.sql in notes database
+6. Modify server.py and change following configuration based on your requirements
 	<pre class="console">
 	app.config['MYSQL_DATABASE_USER'] = 'user'
 	app.config['MYSQL_DATABASE_PASSWORD'] = 'pass'
