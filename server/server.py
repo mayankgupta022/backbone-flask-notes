@@ -21,6 +21,8 @@ def log(msg):
 
 @app.route('/notes', methods=['GET', 'POST', 'OPTIONS'])
 def notes():
+	params  = json.loads(json.dumps(request.json))
+
 	con = mysql.connect()
 	cursor = con.cursor()
 	info = dict()
@@ -32,8 +34,8 @@ def notes():
 		info = [{"id" : item[0], "title": item[1], "description": item[2]} for item in data]
 
 	elif request.method == 'POST':
-		title = request.form['title']
-		description = request.form['description']
+		title = params['title']
+		description = params['description']
 		stmt = "INSERT INTO notes (title, description) VALUES (%s, %s)"
 		data = (title, description)
 		cursor.execute(stmt, data)
@@ -45,6 +47,8 @@ def notes():
 
 @app.route('/note/<int:id>', methods=['GET', 'PUT', 'DELETE', 'OPTIONS'])
 def note(id):
+	params  = json.loads(json.dumps(request.json))
+
 	con = mysql.connect()
 	cursor = con.cursor()
 	info = dict()
@@ -57,12 +61,12 @@ def note(id):
 		info = {"id" : data[0], "title": data[1], "description": data[2]}		
 
 	elif request.method == 'PUT':
-		title = request.form['title']
-		description = request.form['description']
+		title = params['title']
+		description = params['description']
 		stmt = "UPDATE notes SET title = %s , description = %s WHERE id = %s"
+
 		data = (title, description,id)
 		cursor.execute(stmt, data)
-		log(str(id))
 		con.commit()
 		info = {"id" : id, "title": title, "description": description}
 

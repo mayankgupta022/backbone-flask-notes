@@ -17,7 +17,7 @@ define(function (require) {
             }
 
             if (!options.xhrFields) {
-                options.xhrFields = {withCredentials:true};
+                options.xhrFields = {withCredentials:false};
             }
 
             return originalSync(method, model, options);

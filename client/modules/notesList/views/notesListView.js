@@ -13,20 +13,19 @@ define(function (require) {
         collection: null,
 
         initialize: function() {
-            this.collection = new Collection();
             this.render();
         },
 
         render: function () {
             var self = this;
 
+            this.collection = new Collection();
             this.collection.fetch({
                 success: function (data) {
-                        self.$el.html(template(this.collection.models));
+                        self.$el.html(template(self.collection));
                 },
-                error: function (data, response) {
+                error: function (data, response, options) {
                     console.log('Failed to load details.');
-                    console.log(response);
                 }
             });
 

@@ -13,7 +13,6 @@ define(function (require) {
         model: null,
 
         initialize: function(options) {
-            console.log("init");
             if(options) {
                 this.model = new Model(options);
                 this.fetchDetails();
@@ -25,7 +24,8 @@ define(function (require) {
         },
 
         events: {
-            "click #submit" : "submitDetails"
+            "click #submit" : "submitDetails",
+            "click #delete" : "deleteDetails"
         },
 
         submitDetails: function() {
@@ -34,11 +34,27 @@ define(function (require) {
             $('#msg').html('');
 
             this.model.attributes.title = $('#title', this.$el).val();
-            this.model.attributes.description = $('#description', this.$el).html();
+            this.model.attributes.description = $('#description', this.$el).val();
 
-            this.model.save({
+            this.model.save(null,{
                 success: function (data) {
-                        document.router.navigate("", {trigger: true, replace: true});
+                    document.router.navigate("", {trigger: true, replace: true});
+                },
+                error: function (data) {
+                    $('#msg').html('Failed to save details.');
+                }
+            });
+
+        },
+
+        deleteDetails: function() {
+            var self = this;
+
+            $('#msg').html('');
+
+            this.model.destroy({
+                success: function (data) {
+                    document.router.navigate("", {trigger: true, replace: true});
                 },
                 error: function (data) {
                     $('#msg').html('Failed to save details.');
@@ -50,7 +66,6 @@ define(function (require) {
         fetchDetails: function() {
             var self = this;
 
-            console.log("fetch");
             this.model.fetch({
                 success: function (data) {
                         self.render();
@@ -64,7 +79,6 @@ define(function (require) {
         },
 
         render: function () {
-            console.log("render");
             this.$el.html(template(this.model.attributes));
             return this;
         }

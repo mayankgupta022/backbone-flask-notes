@@ -7,7 +7,6 @@ define(function (require) {
     return Backbone.Collection.extend({
 
     	url: document.serverURL + 'notes'
-        // url: 'http://localhost:84/user/getInfo'
     });
 
 });
